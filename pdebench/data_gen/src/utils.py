@@ -33,14 +33,13 @@ def resolve_path(path, idx=None, unique=True):
         idx = 0
     else:
         matches = sorted(matches)
-    
+
     if unique and len(matches) > 1:
-        raise ValueError("Too many matches for glob: {}".format(path))
-    else:
-        try:
-            return matches[idx]
-        except IndexError:
-            raise FileNotFoundError("No matches for glob: {}".format(path))
+        raise ValueError(f"Too many matches for glob: {path}")
+    try:
+        return matches[idx]
+    except IndexError:
+        raise FileNotFoundError(f"No matches for glob: {path}")
 
 
 def print_config(config: DictConfig, resolve: bool = True,):

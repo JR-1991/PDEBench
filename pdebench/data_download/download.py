@@ -36,10 +36,11 @@ def main(config: DictConfig):
     files_list = dv_dataset.json()["data"]["latestVersion"]["files"]
 
     # Compile list of files that matches the desired filename
-    files = []
-    for i, file in enumerate(files_list):
-        if config.args.filename in file["dataFile"]["filename"]:
-            files.append(file)
+    files = [
+        file
+        for file in files_list
+        if config.args.filename in file["dataFile"]["filename"]
+    ]
 
     # Download the files
     download_files(data_api, dataset, files, os.path.abspath(config.args.data_folder))

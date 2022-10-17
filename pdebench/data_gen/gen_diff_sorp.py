@@ -74,32 +74,32 @@ def main(config: DictConfig):
 
     # Imports should be nested inside @hydra.main to optimize tab completion
     # Read more here: https://github.com/facebookresearch/hydra/issues/934
-    
+
     # Change to original working directory to import modules
-    
+
     temp_path = os.getcwd()
     os.chdir(get_original_cwd())
-    
+
     from src import utils
     import h5py
-    
+
     # Change back to the hydra working directory    
     os.chdir(temp_path)
-    
+
     work_path = os.path.dirname(config.work_dir)
     output_path = os.path.join(work_path, config.data_dir, config.output_path)
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
-    config.output_path = os.path.join(output_path, config.output_path) + '.h5'
-    
+    config.output_path = f'{os.path.join(output_path, config.output_path)}.h5'
+
     num_samples_init = 0
     num_samples_final = 10000
-    
+
     pool = mp.Pool(mp.cpu_count())
     seed = np.arange(num_samples_init, num_samples_final)
     seed = seed.tolist()
     pool.starmap(simulator, zip(repeat(config), seed))
-    
+
     if config.upload:
         dataverse_upload(
             file_path=config.output_path,

@@ -19,7 +19,7 @@ class Simulator:
                  ydim: int = 50,
                  n: int = 1,
                  seed: int = 0):
-    
+
         """
         Constructor method initializing the parameters for the diffusion
         sorption problem.
@@ -47,24 +47,24 @@ class Simulator:
         self.X1 = x_right
         self.Y0 = y_bottom
         self.Y1 = y_top
-        
+
         self.Nx = xdim
         self.Ny = ydim
         self.Nt = tdim
-        
+
         # Calculate grid size and generate grid        
         self.dx = (self.X1 - self.X0)/(self.Nx)
         self.dy = (self.Y1 - self.Y0)/(self.Ny)
-        
+
         self.x = np.linspace(self.X0 + self.dx/2, self.X1 - self.dx/2, self.Nx)
         self.y = np.linspace(self.Y0 + self.dy/2, self.Y1 - self.dy/2, self.Ny)
-        
+
         # Time steps to store the simulation results
         self.t = np.linspace(0, self.T, self.Nt)
-        
+
         # Initialize the logger
         self.log = logging.getLogger(__name__)
-        
+
         self.seed = seed
         
     def generate_sample(self):
@@ -136,19 +136,19 @@ class Simulator:
         # Separate y into u and v
         u = y[:self.Nx*self.Ny]
         v = y[self.Nx*self.Ny:]
-       
+
         # Calculate reaction function for each unknown
         react_u = u - u**3 - self.k - v
         react_v = u - v
-       
+
         # Calculate time derivative for each unknown
         u_t = react_u + self.Du * (self.lap @ u)
         v_t = react_v + self.Dv * (self.lap @ v)
-        
+
         # Stack the time derivative into a single array y_t
         y_t = np.concatenate((u_t,v_t))
-        
+
         # Log the simulation progress
-        self.log.info('t = ' + str(t))
-       
+        self.log.info(f't = {str(t)}')
+
         return y_t

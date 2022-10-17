@@ -296,7 +296,7 @@ def main(cfg: DictConfig) -> None:
         uu = vm_evolve(u, nu)
 
     print('data saving...')
-    cwd = hydra.utils.get_original_cwd() + '/'
+    cwd = f'{hydra.utils.get_original_cwd()}/'
     jnp.save(cwd + cfg.multi.save+'/2D_ReacDiff_Multi_beta'+str(beta)[:5]+'_key'+str(cfg.multi.init_key), uu)
     jnp.save(cwd + cfg.multi.save+'/x_coordinate', xc)
     jnp.save(cwd + cfg.multi.save+'/y_coordinate', yc)

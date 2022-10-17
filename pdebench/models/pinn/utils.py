@@ -51,7 +51,7 @@ class PINNDataset1D(Dataset):
 
             # permute from [t, x] -> [x, t]
             permute_idx = list(range(1, len(self.data_output.shape) - 1))
-            permute_idx.extend(list([0, -1]))
+            permute_idx.extend([0, -1])
             self.data_output = self.data_output.permute(permute_idx)
 
     def get_test_data(self, n_last_time_steps, n_components=1):
@@ -97,8 +97,7 @@ class PINNDataset1D(Dataset):
         # xx, yy = np.meshgrid(x_space, y_space)
 
         tt = np.ones_like(x_space) * time
-        val_input = np.vstack((x_space, tt)).T
-        return val_input
+        return np.vstack((x_space, tt)).T
 
     def __len__(self):
         return len(self.data_output)
@@ -148,7 +147,7 @@ class PINNDataset2D(Dataset):
 
             # permute from [t, x, y] -> [x, y, t]
             permute_idx = list(range(1, len(self.data_output.shape) - 1))
-            permute_idx.extend(list([0, -1]))
+            permute_idx.extend([0, -1])
             self.data_output = self.data_output.permute(permute_idx)
 
     def generate_plot_input(self, time=1.0):
@@ -164,8 +163,7 @@ class PINNDataset2D(Dataset):
         )
         xx, yy = np.meshgrid(x_space, y_space)
         tt = np.ones_like(xx) * time
-        val_input = np.vstack((np.ravel(xx), np.ravel(yy), np.ravel(tt))).T
-        return val_input
+        return np.vstack((np.ravel(xx), np.ravel(yy), np.ravel(tt))).T
 
     def __len__(self):
         return len(self.data_output)
@@ -340,9 +338,7 @@ class PINNDataset1Dpde(Dataset):
         # # dim t = [t]
         self.data_grid_t = torch.tensor(h5_file["t-coordinate"], dtype=torch.float)
 
-        # main data
-        keys = list(h5_file.keys())
-        keys.sort()
+        keys = sorted(h5_file.keys())
         if 'tensor' in keys:
             self.data_output = torch.tensor(np.array(h5_file["tensor"][val_batch_idx]),
                                             dtype=torch.float)
@@ -433,8 +429,7 @@ class PINNDataset1Dpde(Dataset):
         # xx, yy = np.meshgrid(x_space, y_space)
 
         tt = np.ones_like(x_space) * time
-        val_input = np.vstack((x_space, tt)).T
-        return val_input
+        return np.vstack((x_space, tt)).T
 
     def __len__(self):
         return len(self.data_output)

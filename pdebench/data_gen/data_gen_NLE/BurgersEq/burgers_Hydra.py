@@ -253,7 +253,7 @@ def main(cfg: DictConfig) -> None:
     @jax.jit
     def update(u, u_tmp, dt):
         f = flux(u_tmp)
-        u -= dt * dx_inv * (f[1:cfg.args.nx + 1] - f[0:cfg.args.nx])
+        u -= dt * dx_inv * (f[1:cfg.args.nx + 1] - f[:cfg.args.nx])
         return u
 
     def flux(u):
@@ -274,7 +274,7 @@ def main(cfg: DictConfig) -> None:
     print('final time is: {0:.3f}'.format(t))
 
     print('data saving...')
-    cwd = hydra.utils.get_original_cwd() + '/'
+    cwd = f'{hydra.utils.get_original_cwd()}/'
     if cfg.args.init_mode=='sinsin':
         jnp.save(cwd + cfg.args.save + '/Burgers_' + cfg.args.init_mode + '_u' + str(cfg.args.u0) + '_du' + str(
             cfg.args.du) + '_Nu' + str(cfg.args.epsilon), uu)

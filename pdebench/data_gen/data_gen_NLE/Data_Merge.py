@@ -161,20 +161,17 @@ from omegaconf import DictConfig
 def _mergeRD(var, DataND, savedir):
     _vars = ['2D', 'nu']
     if var not in _vars:
-        print(var+' is not defined!')
+        print(f'{var} is not defined!')
         return None
 
     idx = 0
-    datas = glob.glob(savedir+'/' + var + '*key*.npy')
+    datas = glob.glob(f'{savedir}/{var}*key*.npy')
     datas.sort()
     for data in datas:
         print(idx, data)
         test = np.load(data).squeeze()
         batch = min(test.shape[0], DataND.shape[0] - idx)
-        if var == '2D':
-            DataND[idx:idx + batch] = test[:batch, -2]
-        else:
-            DataND[idx:idx + batch] = test[:batch]
+        DataND[idx:idx + batch] = test[:batch, -2] if var == '2D' else test[:batch]
         idx += batch
 
     return DataND[:idx]
@@ -187,11 +184,11 @@ def _merge(var, DataND, dim, savedir):
     elif dim == 3:
         _vars = ['D', 'P', 'Vx', 'Vy', 'Vz']
     if var not in _vars:
-        print(var+' is not defined!')
+        print(f'{var} is not defined!')
         return None
 
     idx = 0
-    datas = glob.glob(savedir+'/HD*' + var + '.npy')
+    datas = glob.glob(f'{savedir}/HD*{var}.npy')
     datas.sort()
     for data in datas:
         print(idx, data)

@@ -179,10 +179,9 @@ class UNetDatasetSingle(Dataset):
         # Define path to files
         root_path = os.path.abspath(saved_folder + filename)
         assert filename[-2:] != 'h5', 'HDF5 data is assumed!!'
-        
+
         with h5py.File(root_path, 'r') as f:
-            keys = list(f.keys())
-            keys.sort()
+            keys = sorted(f.keys())
             if 'tensor' not in keys:
                 _data = np.array(f['density'], dtype=np.float32)  # batch, time, x,...
                 idx_cfd = _data.shape
@@ -240,7 +239,7 @@ class UNetDatasetSingle(Dataset):
                     ## convert to [x1, ..., xd, t, v]
                     _data = np.transpose(_data, (0, 2, 3, 1))
                     self.data[...,3] = _data   # batch, x, t, ch
-                    
+
             if len(idx_cfd)==5:  # 3D
                     self.data = np.zeros([idx_cfd[0]//reduced_batch,
                                           idx_cfd[2]//reduced_resolution,
@@ -317,7 +316,7 @@ class UNetDatasetSingle(Dataset):
 
         # Time steps used as initial conditions
         self.initial_step = initial_step
-        
+
         self.data = torch.tensor(self.data)
 
 
@@ -348,10 +347,10 @@ class UNetDatasetMult(Dataset):
         :type initial_step: INT, optional
 
         """
-        
+
         # Define path to files
         self.file_path = os.path.abspath(saved_folder + filename + ".h5")
-        
+
         # Extract list of seeds
         with h5py.File(self.file_path, 'r') as h5_file:
             data_list = sorted(h5_file.keys())
@@ -361,7 +360,7 @@ class UNetDatasetMult(Dataset):
             self.data_list = np.array(data_list[test_idx:])
         else:
             self.data_list = np.array(data_list[:test_idx])
-        
+
         # Time steps used as initial conditions
         self.initial_step = initial_step
 
@@ -373,14 +372,14 @@ class UNetDatasetMult(Dataset):
         # Open file and read data
         with h5py.File(self.file_path, 'r') as h5_file:
             seed_group = h5_file[self.data_list[idx]]
-        
+
             # data dim = [t, x1, ..., xd, v]
             data = np.array(seed_group["data"], dtype='f')
             data = torch.tensor(data, dtype=torch.float)
-            
+
             # convert to [x1, ..., xd, t, v]
             permute_idx = list(range(1,len(data.shape)-1))
-            permute_idx.extend(list([0, -1]))
+            permute_idx.extend([0, -1])
             data = data.permute(permute_idx)
-            
+
         return data[...,:self.initial_step,:], data

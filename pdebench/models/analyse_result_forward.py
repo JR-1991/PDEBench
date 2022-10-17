@@ -154,14 +154,14 @@ def main():
     # get results
     files = glob.glob('./*pickle')
     files.sort()
-    
+
     # metric names
     var_names = ['MSE', 'normalized MSE', 'Conservation MSE', 'Maximum Error', 'MSE at boundary',
                  'MSE FT low', 'MSE FT mid', 'MSE FT high']
-    
+
     # define index
     index1, index2, index3 = [], [], []
-    for j, fl in enumerate(files):
+    for fl in files:
         with open(fl, 'rb') as f:
             title = fl.split('\\')[-1][:-7].split('_')
             print(title)
@@ -192,7 +192,7 @@ def main():
                 index2.append(title[1] + title[2])
                 index3.append(title[3])
     indexes = [index1, index2, index3]
-    
+
     # create dataframe
     data = np.zeros([len(files), 8])
     for j, fl in enumerate(files):
@@ -203,23 +203,23 @@ def main():
                     data[j, i:] = var
                 else:
                     data[j, i] = var
-    
+
     index = pd.MultiIndex.from_arrays(indexes, names=('PDE', 'param', 'model'))
     data = pd.DataFrame(data, columns=var_names, index=index)
     data.to_csv('Results.csv')
-    
+
     pdes = index.get_level_values(0).drop_duplicates()
     num_pdes = len(pdes)
     models = index.get_level_values(2).drop_duplicates()
     num_models = len(models)
     x = np.arange(num_pdes)
     width = 0.5/(num_models-1)
-    
+
     fig, ax = plt.subplots(figsize=(8,6))
     for i in range(num_models):
         pos = x-0.3 + 0.5/(num_models-1)*i
         ax.bar(pos, data[data.index.isin([models[i]],level=2)]['MSE'], width)
-    
+
     ax.set_xticks(x)
     ax.set_xticklabels(pdes,fontsize=30)
     ax.tick_params(axis='y',labelsize=30)

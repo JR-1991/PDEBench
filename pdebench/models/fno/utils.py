@@ -182,10 +182,9 @@ class FNODatasetSingle(Dataset):
         # Define path to files
         root_path = os.path.abspath(saved_folder + filename)
         assert filename[-2:] != 'h5', 'HDF5 data is assumed!!'
-        
+
         with h5py.File(root_path, 'r') as f:
-            keys = list(f.keys())
-            keys.sort()
+            keys = sorted(f.keys())
             if 'tensor' not in keys:
                 _data = np.array(f['density'], dtype=np.float32)  # batch, time, x,...
                 idx_cfd = _data.shape
@@ -253,7 +252,7 @@ class FNODatasetSingle(Dataset):
                     y = torch.tensor(y, dtype=torch.float)
                     X, Y = torch.meshgrid(x, y)
                     self.grid = torch.stack((X, Y), axis=-1)[::reduced_resolution, ::reduced_resolution]
-            
+
             if len(idx_cfd)==5:  # 3D
                     self.data = np.zeros([idx_cfd[0]//reduced_batch,
                                           idx_cfd[2]//reduced_resolution,
@@ -300,9 +299,9 @@ class FNODatasetSingle(Dataset):
                     z = torch.tensor(z, dtype=torch.float)
                     X, Y, Z = torch.meshgrid(x, y, z)
                     self.grid = torch.stack((X, Y, Z), axis=-1)[::reduced_resolution,\
-                                                                ::reduced_resolution,\
-                                                                ::reduced_resolution]
-                                                                
+                                                                    ::reduced_resolution,\
+                                                                    ::reduced_resolution]
+
             else:  # scalar equations
                 ## data dim = [t, x1, ..., xd, v]
                 _data = np.array(f['tensor'], dtype=np.float32)  # batch, time, x,...
@@ -380,10 +379,10 @@ class FNODatasetMult(Dataset):
         :type initial_step: INT, optional
 
         """
-        
+
         # Define path to files
         self.file_path = os.path.abspath(saved_folder + filename + ".h5")
-        
+
         # Extract list of seeds
         with h5py.File(self.file_path, 'r') as h5_file:
             data_list = sorted(h5_file.keys())
@@ -393,7 +392,7 @@ class FNODatasetMult(Dataset):
             self.data_list = np.array(data_list[test_idx:])
         else:
             self.data_list = np.array(data_list[:test_idx])
-        
+
         # Time steps used as initial conditions
         self.initial_step = initial_step
 
@@ -405,19 +404,19 @@ class FNODatasetMult(Dataset):
         # Open file and read data
         with h5py.File(self.file_path, 'r') as h5_file:
             seed_group = h5_file[self.data_list[idx]]
-        
+
             # data dim = [t, x1, ..., xd, v]
             data = np.array(seed_group["data"], dtype='f')
             data = torch.tensor(data, dtype=torch.float)
-            
+
             # convert to [x1, ..., xd, t, v]
             permute_idx = list(range(1,len(data.shape)-1))
-            permute_idx.extend(list([0, -1]))
+            permute_idx.extend([0, -1])
             data = data.permute(permute_idx)
-            
+
             # Extract spatial dimension of data
             dim = len(data.shape) - 2                                               
-            
+
             # x, y and z are 1-D arrays
             # Convert the spatial coordinates to meshgrid
             if dim == 1:
@@ -439,5 +438,5 @@ class FNODatasetMult(Dataset):
                 z = torch.tensor(z, dtype=torch.float)
                 X, Y, Z = torch.meshgrid(x, y, z)
                 grid = torch.stack((X,Y,Z),axis=-1)
-        
+
         return data[...,:self.initial_step,:], data, grid

@@ -159,14 +159,14 @@ def main():
     num_models = len(models)
     x = np.arange(num_pdes)
     width = 0.5/(num_models)
-    
+
     fig, ax = plt.subplots(figsize=(8,6))
     for i in range(num_models):
         pos = x - 0.125 + 0.5/(num_models)*i
         ax.bar(pos, data[data.iloc[:,1] == 'mean'][models[i]],
                yerr = data[data.iloc[:,1] == 'std'][models[i]], width=width)
         print(width, pos)
-    
+
     ax.set_xticks(x)
     ax.set_xticklabels(pdes,rotation=45,fontsize=30)
     ax.tick_params(axis='y',labelsize=30)

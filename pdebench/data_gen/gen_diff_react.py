@@ -87,12 +87,12 @@ def main(config: DictConfig):
 
     # Change back to the hydra working directory
     os.chdir(temp_path)
-    
+
     work_path = os.path.dirname(config.work_dir)
     output_path = os.path.join(work_path, config.data_dir, config.output_path)
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
-    config.output_path = os.path.join(output_path, config.output_path) + '.h5'
+    config.output_path = f'{os.path.join(output_path, config.output_path)}.h5'
 
     num_samples_init = 0
     num_samples_final = 1000

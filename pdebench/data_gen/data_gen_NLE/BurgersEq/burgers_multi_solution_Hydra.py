@@ -253,7 +253,7 @@ def main(cfg: DictConfig) -> None:
     @jax.jit
     def update(u, u_tmp, dt):
         f = flux(u_tmp)
-        u -= dt * dx_inv * (f[1:cfg.multi.nx + 1] - f[0:cfg.multi.nx])
+        u -= dt * dx_inv * (f[1:cfg.multi.nx + 1] - f[:cfg.multi.nx])
         return u
 
     def flux(u):
@@ -277,7 +277,7 @@ def main(cfg: DictConfig) -> None:
     local_devices = jax.local_device_count()
     uu = vm_evolve(u.reshape([local_devices, cfg.multi.numbers//local_devices, -1]))
 
-    cwd = hydra.utils.get_original_cwd() + '/'
+    cwd = f'{hydra.utils.get_original_cwd()}/'
     jnp.save(cwd+cfg.multi.save+'1D_Burgers_Sols_Nu'+str(epsilon)[:5], uu)
     jnp.save(cwd + cfg.multi.save + '/x_coordinate', xc)
     jnp.save(cwd + cfg.multi.save + '/t_coordinate', tc)

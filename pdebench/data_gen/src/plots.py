@@ -54,11 +54,8 @@ def phi_plots(results, T_results, title, filepath, scale = 1, bbox_inches='tight
     images = []
     upperfilepath = filepath
     for i, arr in enumerate(T_results):
-        filename = '{}.png'.format(title)
-        if upperfilepath == '':
-            filepath = filename
-        else:
-            filepath = upperfilepath + '/{}'.format(filename)
+        filename = f'{title}.png'
+        filepath = filename if upperfilepath == '' else f'{upperfilepath}/{filename}'
         save_phi_plot(
             scale * results[i], title, filepath, bbox_inches=bbox_inches, pad_inches=pad_inches)
         images.append(imageio.imread(filepath))
@@ -73,12 +70,9 @@ def save_sim_figures(results, T_results, simulation_name, kinematic_value, filep
     upperfilepath = filepath
     for i, arr in enumerate(T_results):
         res = arr[0]
-        title = '{}_{}_t={}'.format(simulation_name, kinematic_value, round(T_results[i], 2))
-        filename = '{}.png'.format(title)
-        if upperfilepath == '':
-            filepath = filename
-        else:
-            filepath = upperfilepath + '/{}'.format(filename)
+        title = f'{simulation_name}_{kinematic_value}_t={round(T_results[i], 2)}'
+        filename = f'{title}.png'
+        filepath = filename if upperfilepath == '' else f'{upperfilepath}/{filename}'
         save_phi_plot(
             scale * res, title, filepath, bbox_inches=bbox_inches, pad_inches=pad_inches)
         images.append(imageio.imread(filepath))

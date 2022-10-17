@@ -208,38 +208,32 @@ class ProbRasterLatent(PyroModule):
         print(self.latent_dims,self.dims)
 
     def get_latent(self):
-        if self.latent_dims==self.dims:
-            return self.latent.unsqueeze(0)
-        # `mini-batch x channels x [optional depth] x [optional height] x width`.
-        l =  F.interpolate(
-            self.latent.unsqueeze(1),
-            self.dims,
-            mode=self.interpolation,
-            align_corners=False
-        ).squeeze(0) #squeeze/unsqueeze is because of weird interpolate semantics
-        return l
+      if self.latent_dims==self.dims:
+          return self.latent.unsqueeze(0)
+      return F.interpolate(
+          self.latent.unsqueeze(1),
+          self.dims,
+          mode=self.interpolation,
+          align_corners=False,
+      ).squeeze(0)
 
     def latent2source(self,latent):
-        if latent.shape==self.dims:
-            return latent.unsqueeze(0)
-        # `mini-batch x channels x [optional depth] x [optional height] x width`.
-        l =  F.interpolate(
-            latent.unsqueeze(1),
-            self.dims,
-            mode=self.interpolation,
-            align_corners=False
-        ).squeeze(0) #squeeze/unsqueeze is because of weird interpolate semantics
-        return l
+      if latent.shape==self.dims:
+          return latent.unsqueeze(0)
+      return F.interpolate(
+          latent.unsqueeze(1),
+          self.dims,
+          mode=self.interpolation,
+          align_corners=False,
+      ).squeeze(0)
 
     def forward(self, grid, y=None):
-        #overwrite process predictor batch with my own latent
-        x = self.get_latent()
-        # print("forward:x.shape,grid.shape=",x.shape,grid.shape)
-        mean = self.process_predictor(x.to(self.device),grid.to(self.device))
-        o = pyro.sample(
-            "obs", dist.Normal(mean, self.obs_scale).to_event(2),
-            obs=y)
-        return o    
+      #overwrite process predictor batch with my own latent
+      x = self.get_latent()
+      # print("forward:x.shape,grid.shape=",x.shape,grid.shape)
+      mean = self.process_predictor(x.to(self.device),grid.to(self.device))
+      return pyro.sample(
+          "obs", dist.Normal(mean, self.obs_scale).to_event(2), obs=y)    
 
 
 import sys

@@ -15,7 +15,7 @@ class HDF5Dataset(Dataset):
         path = Path(dir_path)
         assert path.is_dir()
         files_path = list(path.glob('*.h5'))  # all .h5 files' path
-        assert len(files_path) > 0
+        assert files_path
 
         self.data_info = {}
         self.transform = transform
@@ -33,7 +33,7 @@ class HDF5Dataset(Dataset):
                         self.data_info[ds_name] = [ds[...]]
                     else:
                         self.data_info[ds_name].append(ds[...])
-                last_count = self.count[-1] if len(self.count) > 0 else 0
+                last_count = self.count[-1] if self.count else 0
                 self.count.append(last_count + b)
                 self.config.append(config)
 
@@ -47,14 +47,16 @@ class HDF5Dataset(Dataset):
         return data, config
 
     def _load_data(self, idx):
-        ds = []
         for n in self.count:
             if n >= idx + 1:
                 batch_idx = self.count.index(n)
                 break
         last_count = self.count[batch_idx - 1] if batch_idx > 0 else 0
-        for ds_list in self.data_info.values():
-            ds.append(ds_list[batch_idx][idx - last_count])
+        ds = [
+            ds_list[batch_idx][idx - last_count]
+            for ds_list in self.data_info.values()
+        ]
+
         return ds, self.config[batch_idx]
 
 
