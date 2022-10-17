@@ -259,7 +259,7 @@ def main(cfg: DictConfig) -> None:
         u = Piecewise_Exact_Solution(u, dt)
         # diffusion
         f = flux(u_tmp)
-        u -= dt * dx_inv * (f[1:cfg.multi.nx + 1] - f[0:cfg.multi.nx])
+        u -= dt * dx_inv * (f[1:cfg.multi.nx + 1] - f[:cfg.multi.nx])
         return u
 
     @jax.jit
@@ -285,7 +285,7 @@ def main(cfg: DictConfig) -> None:
     uu = vm_evolve(u.reshape([local_devices, cfg.multi.numbers//local_devices, -1]))
 
     print('data saving...')
-    cwd = hydra.utils.get_original_cwd() + '/'
+    cwd = f'{hydra.utils.get_original_cwd()}/'
     jnp.save(cwd + cfg.multi.save+'/ReacDiff_Nu'+str(nu)[:5]+'_Rho'+str(rho)[:5], uu)
     jnp.save(cwd + cfg.multi.save+'/x_coordinate', xc)
     jnp.save(cwd + cfg.multi.save+'/t_coordinate', tc)

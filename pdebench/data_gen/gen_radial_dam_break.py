@@ -39,7 +39,7 @@ log = logging.getLogger(__name__)
 def simulator(base_config, i):
     
     from src.sim_radial_dam_break.py import RadialDamBreak2D
-    
+
     config = deepcopy(base_config)
     config.sim.seed = i
     log.info(f"Starting seed {i}")
@@ -59,9 +59,9 @@ def simulator(base_config, i):
     scenario.run(T=config.sim.T_end, tsteps=config.sim.n_time_steps, plot=False)
     duration = time.time() - start_time
     log.info(f"Seed {config.sim.seed} took {duration} to finish")
-    config.output_path = config.output_path + "_" + str(i).zfill(4) + ".h5"
+    config.output_path = f"{config.output_path}_{str(i).zfill(4)}.h5"
     scenario.save_state_to_disk(filepath=config.output_path)
-    
+
     with h5py.File(config.output_path, "r+") as f:
         f.attrs["config"] = OmegaConf.to_yaml(config)
 
@@ -90,10 +90,10 @@ def main(config: DictConfig):
 
     temp_path = os.getcwd()
     os.chdir(get_original_cwd())
-    
+
     # Change back to the hydra working directory    
     os.chdir(temp_path)
-    
+
     work_path = os.path.dirname(config.work_dir)
     output_path = os.path.join(work_path, config.data_dir, config.output_path)
     if not os.path.isdir(output_path):
@@ -102,7 +102,7 @@ def main(config: DictConfig):
 
     num_samples_init = 0
     num_samples_final = 1000
-    
+
     pool = mp.Pool(mp.cpu_count())
     seed = np.arange(num_samples_init, num_samples_final)
     seed = seed.tolist()

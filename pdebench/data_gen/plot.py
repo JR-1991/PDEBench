@@ -25,28 +25,27 @@ def main(config: DictConfig):
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
     config.output_path = os.path.join(output_path, config.output_path)
-    
+
     # Open and load file
-    data_path = config.output_path + '.h5'
+    data_path = f'{config.output_path}.h5'
     h5_file = h5py.File(data_path, "r")
-    
+
+    # Choose random sample number
+    idx_max = 10000 if config.plot.dim == 1 else 1000
     if "seed" in config.sim.keys():
-        # Choose random sample number
-        idx_max = 10000 if config.plot.dim == 1 else 1000
         config.sim.seed = np.random.randint(0, idx_max)
         postfix = str(config.sim.seed).zfill(4)
         data = np.array(h5_file[f"{postfix}/data"], dtype="f")
         t = np.array(h5_file[f"{postfix}/grid/t"], dtype="f")
-        # data dim = [t, x1, ..., xd, v]
+            # data dim = [t, x1, ..., xd, v]
     else:
-        idx_max = 10000 if config.plot.dim == 1 else 1000
         postfix = np.random.randint(0, idx_max)
         data = np.array(h5_file["data"], dtype="f")
         data = data[postfix]
         t = np.array(h5_file["grid/t"], dtype="f")
         t = t[postfix]
-        # data dim = [t, x1, ..., xd, v]
-    
+            # data dim = [t, x1, ..., xd, v]
+
     h5_file.close()
 
     os.chdir(get_original_cwd())
@@ -57,8 +56,9 @@ def main(config: DictConfig):
         config.plot.channel_idx,
         config.plot.t_idx,
         config,
-        config.name + "_" + postfix + ".png",
+        f"{config.name}_{postfix}.png",
     )
+
 
     return
 

@@ -204,7 +204,7 @@ def main(cfg: DictConfig) -> None:
 
 
     print('data saving...')
-    cwd = hydra.utils.get_original_cwd() + '/'
+    cwd = f'{hydra.utils.get_original_cwd()}/'
     jnp.save(cwd + cfg.args.save + '/Advection_beta' + str(cfg.args.beta), uu)
     jnp.save(cwd + cfg.args.save + '/x_coordinate', xe)
     jnp.save(cwd + cfg.args.save + '/t_coordinate', tc)

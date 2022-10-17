@@ -204,16 +204,15 @@ def setup_pde1D(filename="1D_Advection_Sols_beta0.1.hdf5",
     if filename[0] == 'R':
         timedomain = dde.geometry.TimeDomain(0, 1.0)
         pde = lambda x, y : pde_diffusion_reaction_1d(x, y, aux_params[0], aux_params[1])
-    else:
-        if filename.split('_')[1][0]=='A':
-            timedomain = dde.geometry.TimeDomain(0, 2.0)
-            pde = lambda x, y: pde_adv1d(x, y, aux_params[0])
-        elif filename.split('_')[1][0] == 'B':
-            timedomain = dde.geometry.TimeDomain(0, 2.0)
-            pde = lambda x, y: pde_burgers1D(x, y, aux_params[0])
-        elif filename.split('_')[1][0]=='C':
-            timedomain = dde.geometry.TimeDomain(0, 1.0)
-            pde = lambda x, y: pde_CFD1d(x, y, aux_params[0])
+    elif filename.split('_')[1][0]=='A':
+        timedomain = dde.geometry.TimeDomain(0, 2.0)
+        pde = lambda x, y: pde_adv1d(x, y, aux_params[0])
+    elif filename.split('_')[1][0] == 'B':
+        timedomain = dde.geometry.TimeDomain(0, 2.0)
+        pde = lambda x, y: pde_burgers1D(x, y, aux_params[0])
+    elif filename.split('_')[1][0]=='C':
+        timedomain = dde.geometry.TimeDomain(0, 1.0)
+        pde = lambda x, y: pde_CFD1d(x, y, aux_params[0])
     geomtime = dde.geometry.GeometryXTime(geom, timedomain)
 
     dataset = PINNDataset1Dpde(filename, root_path=root_path, val_batch_idx=val_batch_idx)
@@ -371,10 +370,7 @@ def _run_training(scenario, epochs, learning_rate, model_update, flnm,
                                      val_batch_idx=val_batch_idx,
                                      if_periodic_bc=if_periodic_bc,
                                      aux_params=aux_params)
-        if flnm.split('_')[1][0] == 'C':
-            n_components = 3
-        else:
-            n_components = 1
+        n_components = 3 if flnm.split('_')[1][0] == 'C' else 1
     elif scenario == "CFD2D":
         model, dataset = setup_CFD2D(filename=flnm,
                                      root_path=root_path,
@@ -395,11 +391,7 @@ def _run_training(scenario, epochs, learning_rate, model_update, flnm,
         raise NotImplementedError(f"PINN training not implemented for {scenario}")
 
     # filename
-    if if_single_run:
-        model_name = flnm + "_PINN"
-    else:
-        model_name = flnm[:-5] + "_PINN"
-
+    model_name = f"{flnm}_PINN" if if_single_run else f"{flnm[:-5]}_PINN"
     checker = dde.callbacks.ModelCheckpoint(
         f"{model_name}.pt", save_better_only=True, period=5000
     )
@@ -424,38 +416,34 @@ def _run_training(scenario, epochs, learning_rate, model_update, flnm,
         test_gt, n_last_time_steps=20, n_components=n_components
     )
 
-    if if_single_run:
-        errs = metric_func(test_pred, test_gt)
-        errors = [np.array(err.cpu()) for err in errs]
-        print(errors)
-        pickle.dump(errors, open(model_name + ".pickle", "wb"))
-
-        # plot sample
-        plot_input = dataset.generate_plot_input(time=1.0)
-        if scenario == "pde1D":
-            xdim = dataset.xdim
-            dim = 1
-        else:
-            dim = dataset.config["plot"]["dim"]
-            xdim = dataset.config["sim"]["xdim"]
-            if dim == 2:
-                ydim = dataset.config["sim"]["ydim"]
-
-        y_pred = model.predict(plot_input)[:, 0]
-        if dim == 1:
-            plt.figure()
-            plt.plot(y_pred)
-        elif dim == 2:
-            im_data = y_pred.reshape(xdim, ydim)
-            plt.figure()
-            plt.imshow(im_data)
-
-        plt.savefig(f"{model_name}.png")
-
-        # TODO: implement function to get specific timestep from dataset
-        # y_true = dataset[:][1][-xdim * ydim :]
-    else:
+    if not if_single_run:
         return test_pred, test_gt, model_name
+    errs = metric_func(test_pred, test_gt)
+    errors = [np.array(err.cpu()) for err in errs]
+    print(errors)
+    pickle.dump(errors, open(f"{model_name}.pickle", "wb"))
+
+    # plot sample
+    plot_input = dataset.generate_plot_input(time=1.0)
+    if scenario == "pde1D":
+        xdim = dataset.xdim
+        dim = 1
+    else:
+        dim = dataset.config["plot"]["dim"]
+        xdim = dataset.config["sim"]["xdim"]
+        if dim == 2:
+            ydim = dataset.config["sim"]["ydim"]
+
+    y_pred = model.predict(plot_input)[:, 0]
+    if dim == 1:
+        plt.figure()
+        plt.plot(y_pred)
+    elif dim == 2:
+        im_data = y_pred.reshape(xdim, ydim)
+        plt.figure()
+        plt.imshow(im_data)
+
+    plt.savefig(f"{model_name}.png")
 
 def run_training(scenario, epochs, learning_rate, model_update, flnm,
                  input_ch=1, output_ch=1,
@@ -481,7 +469,7 @@ def run_training(scenario, epochs, learning_rate, model_update, flnm,
         errs = metric_func(test_pred, test_gt)
         errors = [np.array(err.cpu()) for err in errs]
         print(errors)
-        pickle.dump(errors, open(model_name + ".pickle", "wb"))
+        pickle.dump(errors, open(f"{model_name}.pickle", "wb"))
 
 
 if __name__ == "__main__":

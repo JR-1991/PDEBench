@@ -89,12 +89,13 @@ def ns_sim(
         Returns:
             Box: A Box type of Phiflow
         """
-        if x == None:
+        if x is None:
             return Box[:, 0:y]
-        elif y == None:
+        elif y is None:
             return Box[0:x, :]
         else:
             return Box[0:x, 0:y]
+
 
 
 
@@ -112,23 +113,23 @@ def ns_sim(
         **kwargs : Other obstacles (Simulation constraints etc)
         """
         # Set empty obstacle as empty tuple
-        if obstacles == None:
+        if obstacles is None:
             obstacles = ()
         # Computing velocity term first
         # Cauchy-momentum equation
         velocity = advect.semi_lagrangian(velocity, velocity, dt=DT) # advection
         velocity = diffuse.explicit(velocity, NU, dt=DT) # diffusion
-        
+
         # Add external body_acceleration, constraints
         velocity += DT * particles * body_acceleration # external body_acceleration
         velocity = fluid.apply_boundary_conditions(velocity, obstacles) # obstacles
-        
+
         # Make incompressible
         velocity, _ = fluid.make_incompressible(velocity, obstacles, solve=Solve('CG-adaptive', 1e-3, 0, x0=None)) # particles
-        
+
         # Computing particles term next 
         particles = advect.semi_lagrangian(particles, velocity, dt=DT)
-        
+
         return velocity, particles
 
     # Setting the random seed for simulation. This is a global seed for Phiflow.
@@ -253,7 +254,7 @@ def ns_sim(
         for step, t in enumerate(tqdm(ts), start=1):
             velocity, particles = sim_step(
                 velocity, particles,)
-            
+
             if step % frame_int == 0:
                 frame_i = step//frame_int
                 log.info(f"step {step} frame_i {frame_i}")

@@ -90,7 +90,7 @@ class UNet1d(nn.Module):
             OrderedDict(
                 [
                     (
-                        name + "conv1",
+                        f"{name}conv1",
                         nn.Conv1d(
                             in_channels=in_channels,
                             out_channels=features,
@@ -99,10 +99,10 @@ class UNet1d(nn.Module):
                             bias=False,
                         ),
                     ),
-                    (name + "norm1", nn.BatchNorm1d(num_features=features)),
-                    (name + "tanh1", nn.Tanh()),
+                    (f"{name}norm1", nn.BatchNorm1d(num_features=features)),
+                    (f"{name}tanh1", nn.Tanh()),
                     (
-                        name + "conv2",
+                        f"{name}conv2",
                         nn.Conv1d(
                             in_channels=features,
                             out_channels=features,
@@ -111,8 +111,8 @@ class UNet1d(nn.Module):
                             bias=False,
                         ),
                     ),
-                    (name + "norm2", nn.BatchNorm1d(num_features=features)),
-                    (name + "tanh2", nn.Tanh()),
+                    (f"{name}norm2", nn.BatchNorm1d(num_features=features)),
+                    (f"{name}tanh2", nn.Tanh()),
                 ]
             )
         )
@@ -184,7 +184,7 @@ class UNet2d(nn.Module):
             OrderedDict(
                 [
                     (
-                        name + "conv1",
+                        f"{name}conv1",
                         nn.Conv2d(
                             in_channels=in_channels,
                             out_channels=features,
@@ -193,10 +193,10 @@ class UNet2d(nn.Module):
                             bias=False,
                         ),
                     ),
-                    (name + "norm1", nn.BatchNorm2d(num_features=features)),
-                    (name + "tanh1", nn.Tanh()),
+                    (f"{name}norm1", nn.BatchNorm2d(num_features=features)),
+                    (f"{name}tanh1", nn.Tanh()),
                     (
-                        name + "conv2",
+                        f"{name}conv2",
                         nn.Conv2d(
                             in_channels=features,
                             out_channels=features,
@@ -205,8 +205,8 @@ class UNet2d(nn.Module):
                             bias=False,
                         ),
                     ),
-                    (name + "norm2", nn.BatchNorm2d(num_features=features)),
-                    (name + "tanh2", nn.Tanh()),
+                    (f"{name}norm2", nn.BatchNorm2d(num_features=features)),
+                    (f"{name}tanh2", nn.Tanh()),
                 ]
             )
         )
@@ -278,7 +278,7 @@ class UNet3d(nn.Module):
             OrderedDict(
                 [
                     (
-                        name + "conv1",
+                        f"{name}conv1",
                         nn.Conv3d(
                             in_channels=in_channels,
                             out_channels=features,
@@ -287,10 +287,10 @@ class UNet3d(nn.Module):
                             bias=False,
                         ),
                     ),
-                    (name + "norm1", nn.BatchNorm3d(num_features=features)),
-                    (name + "tanh1", nn.Tanh()),
+                    (f"{name}norm1", nn.BatchNorm3d(num_features=features)),
+                    (f"{name}tanh1", nn.Tanh()),
                     (
-                        name + "conv2",
+                        f"{name}conv2",
                         nn.Conv3d(
                             in_channels=features,
                             out_channels=features,
@@ -299,8 +299,8 @@ class UNet3d(nn.Module):
                             bias=False,
                         ),
                     ),
-                    (name + "norm2", nn.BatchNorm3d(num_features=features)),
-                    (name + "tanh2", nn.Tanh()),
+                    (f"{name}norm2", nn.BatchNorm3d(num_features=features)),
+                    (f"{name}tanh2", nn.Tanh()),
                 ]
             )
         )

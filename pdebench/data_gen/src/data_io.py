@@ -117,12 +117,19 @@ def dataverse_upload(
         darus_struct["directoryLabel"] = f"{dataverse_dir}/"
     cmd = [
         "curl",
-        "-X", "POST",
-        "-H", f"X-Dataverse-key:{dataverse_token}",
-        "-F", f"file=@{file_path}",
-        "-F", 'jsonData='+json.dumps(darus_struct),
+        "-X",
+        "POST",
+        "-H",
+        f"X-Dataverse-key:{dataverse_token}",
+        "-F",
+        f"file=@{file_path}",
+        "-F",
+        f'jsonData={json.dumps(darus_struct)}',
         f"{dataverse_url}/api/datasets/:persistentId/add?persistentId={dataverse_id}",
-        "--retry", str(retry)]
+        "--retry",
+        str(retry),
+    ]
+
     log.info(f"upload cmd {cmd}")
     subprocess.Popen(cmd)
     log.info(f"upload cmd {os.getcwd()}$ {' '.join(cmd)}")

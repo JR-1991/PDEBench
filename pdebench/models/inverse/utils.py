@@ -269,8 +269,15 @@ def get_metric_name(filename,model_name, base_path,inverse_model_type):
 
     June 2022, F.Alesiani
     """
-    inverse_metric_filename = base_path + filename[:-5] + '_' + model_name +'_'+ inverse_model_type + ".pickle"    
-    return inverse_metric_filename
+    return (
+        base_path
+        + filename[:-5]
+        + '_'
+        + model_name
+        + '_'
+        + inverse_model_type
+        + ".pickle"
+    )
 
 def read_results(model_names,inverse_model_type, base_path, filenames,shortfilenames, verbose=False):
     """

@@ -83,8 +83,7 @@ class Basic2DScenario(ABC):
             self.save_state[key].append(getter())
 
     def init_save_state(self, T, tsteps):
-        self.save_state = {}
-        self.save_state["x"] = self.domain.grid.x.centers.tolist()
+        self.save_state = {"x": self.domain.grid.x.centers.tolist()}
         self.save_state["y"] = self.domain.grid.y.centers.tolist()
         self.save_state["t"] = np.linspace(0.0, T, tsteps + 1).tolist()
         for key, getter in self.state_getters.items():
@@ -119,7 +118,7 @@ class Basic2DScenario(ABC):
             print("Simulating timestep {}/{} at t={:f}".format(tstep, tsteps, t))
             self.simulate(t)
             self.add_save_state()
-        print("Simulation took: {}".format(time.time() - start))
+        print(f"Simulation took: {time.time() - start}")
 
 
 class RadialDamBreak2D(Basic2DScenario):
